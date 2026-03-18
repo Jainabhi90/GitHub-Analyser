@@ -11,6 +11,7 @@ function Dashboard() {
   const [repos, setRepos] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [history, setHistory] = useState([])
 
   async function handleSearch(username) {
     setLoading(true)
@@ -23,6 +24,13 @@ function Dashboard() {
       const reposData = await fetchRepos(username)
       setUser(userData)
       setRepos(reposData)
+
+      // Save to search history (no duplicates, max 5)
+      setHistory(prev => {
+        const filtered = prev.filter(h => h !== username)
+        return [username, ...filtered].slice(0, 5)
+      })
+
     } catch (err) {
       setError(err.message)
     } finally {
@@ -46,6 +54,22 @@ function Dashboard() {
       {/* Search Bar */}
       <SearchBar onSearch={handleSearch} />
 
+      {/* Search History */}
+      {history.length > 0 && (
+        <div className="flex justify-center gap-2 flex-wrap mb-6">
+          <span className="text-gray-400 text-sm mt-1">Recent:</span>
+          {history.map(name => (
+            <button
+              key={name}
+              onClick={() => handleSearch(name)}
+              className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-full transition"
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Loading State */}
       {loading && (
         <div className="flex justify-center items-center mt-16">
@@ -60,6 +84,20 @@ function Dashboard() {
         </div>
       )}
 
+      {/* Empty State - shown before any search */}
+      {!user && !loading && !error && (
+        <div className="flex flex-col items-center justify-center mt-24 text-center">
+          <div className="text-6xl mb-4">🐙</div>
+          <h2 className="text-xl font-semibold text-gray-300">
+            Search for a GitHub user
+          </h2>
+          <p className="text-gray-500 mt-2 max-w-sm">
+            Type any GitHub username above to see their profile,
+            repositories, languages and stats.
+          </p>
+        </div>
+      )}
+
       {/* Main Content */}
       {user && !loading && (
         <div className="max-w-5xl mx-auto mt-8 space-y-8">
@@ -68,7 +106,7 @@ function Dashboard() {
           <ProfileCard user={user} />
 
           {/* Repo Stats */}
-          <RepoStats repos={repos} />
+          <RepoStats repos={repos} user={user} />
 
           {/* Charts Section */}
           {repos.length > 0 && (
