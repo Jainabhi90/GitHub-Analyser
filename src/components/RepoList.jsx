@@ -1,4 +1,3 @@
-cat > src/components/RepoList.jsx << 'EOF'
 import { useState } from 'react'
 
 function RepoList({ repos }) {
@@ -121,6 +120,4 @@ function RepoList({ repos }) {
     </div>
   )
 }
-
 export default RepoList
-EOF
