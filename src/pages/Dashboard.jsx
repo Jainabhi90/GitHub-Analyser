@@ -4,6 +4,7 @@ import ProfileCard from '../components/ProfileCard'
 import RepoStats from '../components/RepoStats'
 import LanguageChart from '../components/LanguageChart'
 import StarChart from '../components/StarChart'
+import RepoList from '../components/RepoList'
 import { fetchUser, fetchRepos } from '../services/githubApi'
 
 function Dashboard() {
@@ -108,12 +109,22 @@ function Dashboard() {
           {/* Repo Stats */}
           <RepoStats repos={repos} user={user} />
 
-          {/* Charts Section */}
+         {/* Charts Section */}
           {repos.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <LanguageChart repos={repos} />
-              <StarChart repos={repos} />
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <LanguageChart repos={repos} />
+                <StarChart repos={repos} />
+              </div>
+
+              {/* Repo List */}
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  Repositories
+                </h2>
+                <RepoList repos={repos} />
+              </div>
+            </>
           )}
 
         </div>
