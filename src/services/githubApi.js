@@ -24,3 +24,12 @@ export async function fetchRepos(username) {
   
   return res.json();
 }
+export async function fetchEvents(username) {
+  const res = await fetch(
+    `${BASE_URL}/users/${username}/events?per_page=100`
+  )
+  if (!res.ok) {
+    throw new Error("Failed to fetch activity data.")
+  }
+  return res.json()
+}

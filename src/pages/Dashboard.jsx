@@ -5,11 +5,13 @@ import RepoStats from '../components/RepoStats'
 import LanguageChart from '../components/LanguageChart'
 import StarChart from '../components/StarChart'
 import RepoList from '../components/RepoList'
-import { fetchUser, fetchRepos } from '../services/githubApi'
+import ActivityGraph from '../components/ActivityGraph'
+import { fetchUser, fetchRepos, fetchEvents } from '../services/githubApi'
 
 function Dashboard() {
   const [user, setUser] = useState(null)
   const [repos, setRepos] = useState([])
+  const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [history, setHistory] = useState([])
@@ -19,14 +21,18 @@ function Dashboard() {
     setError(null)
     setUser(null)
     setRepos([])
+    setEvents([])
 
     try {
-      const userData = await fetchUser(username)
-      const reposData = await fetchRepos(username)
+      const [userData, reposData, eventsData] = await Promise.all([
+        fetchUser(username),
+        fetchRepos(username),
+        fetchEvents(username)
+      ])
       setUser(userData)
       setRepos(reposData)
+      setEvents(eventsData)
 
-      // Save to search history (no duplicates, max 5)
       setHistory(prev => {
         const filtered = prev.filter(h => h !== username)
         return [username, ...filtered].slice(0, 5)
@@ -44,9 +50,7 @@ function Dashboard() {
 
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-white">
-          GitHub Analyser
-        </h1>
+        <h1 className="text-4xl font-bold text-white">GitHub Analyser</h1>
         <p className="text-gray-400 mt-2">
           Enter a GitHub username to explore their profile
         </p>
@@ -71,21 +75,21 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Loading State */}
+      {/* Loading */}
       {loading && (
         <div className="flex justify-center items-center mt-16">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
 
-      {/* Error State */}
+      {/* Error */}
       {error && (
         <div className="max-w-md mx-auto mt-10 bg-red-900 border border-red-500 text-red-200 px-6 py-4 rounded-xl text-center">
-          ⚠️ {error}
+          {error}
         </div>
       )}
 
-      {/* Empty State - shown before any search */}
+      {/* Empty State */}
       {!user && !loading && !error && (
         <div className="flex flex-col items-center justify-center mt-24 text-center">
           <div className="text-6xl mb-4">🐙</div>
@@ -103,19 +107,22 @@ function Dashboard() {
       {user && !loading && (
         <div className="max-w-5xl mx-auto mt-8 space-y-8">
 
-          {/* Profile Card */}
+          {/* Profile */}
           <ProfileCard user={user} />
 
-          {/* Repo Stats */}
+          {/* Stats */}
           <RepoStats repos={repos} user={user} />
 
-         {/* Charts Section */}
           {repos.length > 0 && (
             <>
+              {/* Charts */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <LanguageChart repos={repos} />
                 <StarChart repos={repos} />
               </div>
+
+              {/* Activity Graph */}
+              <ActivityGraph events={events} />
 
               {/* Repo List */}
               <div>
