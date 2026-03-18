@@ -7,7 +7,7 @@ function SearchBar({ onSearch }) {
   }
 
   return (
-    <div className="flex justify-center items-center py-10">
+    <div className="flex justify-center items-center py-6">
       <form
         onSubmit={handleSubmit}
         className="flex gap-3 w-full max-w-lg"
@@ -16,11 +16,11 @@ function SearchBar({ onSearch }) {
           type="text"
           name="username"
           placeholder="Enter GitHub username..."
-          className="flex-1 px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
+          className="flex-1 px-5 py-3 rounded-xl glass text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-blue-500 focus:shadow-lg focus:shadow-blue-500/20 transition-all duration-300"
         />
         <button
           type="submit"
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105"
         >
           Search
         </button>
