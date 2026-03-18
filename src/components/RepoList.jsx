@@ -17,6 +17,10 @@ function RepoList({ repos }) {
     filtered = filtered.filter(repo =>
       repo.name.toLowerCase().includes(filters.search.toLowerCase())
     )
+  } else {
+    filtered = filtered
+      .sort((a, b) => b.stargazers_count - a.stargazers_count)
+      .slice(0, 20)
   }
 
   if (filters.language !== 'All') {
@@ -49,10 +53,11 @@ function RepoList({ repos }) {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4">
+
       <div className="flex flex-wrap gap-4 items-center bg-gray-800 rounded-xl px-6 py-4">
         <input
           type="text"
-          placeholder="Search repos..."
+          placeholder="Search all repos..."
           onChange={e => handleFilterChange('search', e.target.value)}
           className="flex-1 min-w-48 px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500"
         />
@@ -77,7 +82,10 @@ function RepoList({ repos }) {
       </div>
 
       <p className="text-gray-400 text-sm px-1">
-        Showing {filtered.length} of {repos.length} repositories
+        {filters.search
+          ? `Showing ${filtered.length} of ${repos.length} repositories`
+          : `Showing top 20 repositories by stars — search to find more`
+        }
       </p>
 
       {filtered.length === 0 ? (
@@ -87,7 +95,7 @@ function RepoList({ repos }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map(repo => (
-                <a
+            <a
               key={repo.id}
               href={repo.html_url}
               target="_blank"
@@ -120,4 +128,5 @@ function RepoList({ repos }) {
     </div>
   )
 }
+
 export default RepoList
