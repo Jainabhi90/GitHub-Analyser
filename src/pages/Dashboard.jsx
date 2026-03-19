@@ -23,34 +23,41 @@ function Dashboard() {
   const [realCommits, setRealCommits] = useState(null)
 
   async function handleSearch(username) {
-    setLoading(true)
-    setError(null)
-    setUser(null)
-    setRepos([])
-    setEvents([])
-    setRealCommits(null)
+  setLoading(true)
+  setError(null)
+  setUser(null)
+  setRepos([])
+  setEvents([])
+  setRealCommits(null)
 
+  try {
+    const [userData, reposData] = await Promise.all([
+      fetchUser(username),
+      fetchRepos(username),
+    ])
+    setUser(userData)
+    setRepos(reposData)
+
+    // Fetch events separately — don't crash if it fails
     try {
-      const [userData, reposData, eventsData] = await Promise.all([
-        fetchUser(username),
-        fetchRepos(username),
-        fetchEvents(username)
-      ])
-      setUser(userData)
-      setRepos(reposData)
+      const eventsData = await fetchEvents(username)
       setEvents(eventsData)
-
-      setHistory(prev => {
-        const filtered = prev.filter(h => h !== username)
-        return [username, ...filtered].slice(0, 5)
-      })
-
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+    } catch (eventErr) {
+      console.warn('Events fetch failed:', eventErr.message)
+      setEvents([]) // just show empty events
     }
+
+    setHistory(prev => {
+      const filtered = prev.filter(h => h !== username)
+      return [username, ...filtered].slice(0, 5)
+    })
+
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
   }
+}
 
   function SectionHeading({ label, count }) {
     return (
