@@ -32,28 +32,28 @@ function LanguageChart({ repos }) {
     ]
   }
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: '#D1D5DB',
-          padding: 16,
-          font: { size: 12 }
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            const total = values.reduce((a, b) => a + b, 0)
-            const percentage = ((context.parsed / total) * 100).toFixed(1)
-            return ` ${context.label}: ${context.parsed} repos (${percentage}%)`
-          }
+ const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: {
+        color: '#0a0a0a',
+        padding: 16,
+        font: { size: 12, family: 'Space Grotesk' }
+      }
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => {
+          const total = values.reduce((a, b) => a + b, 0)
+          const percentage = ((context.parsed / total) * 100).toFixed(1)
+          return ` ${context.label}: ${context.parsed} repos (${percentage}%)`
         }
       }
     }
   }
+}
 
   if (labels.length === 0) {
     return (
@@ -64,15 +64,15 @@ function LanguageChart({ repos }) {
   }
 
   return (
-    <div className="bg-gray-800 rounded-2xl p-6 shadow-lg">
-      <h3 className="text-white text-lg font-semibold mb-4 text-center">
-        Language Distribution
-      </h3>
-      <div className="max-w-xs mx-auto">
-        <Pie data={data} options={options} />
-      </div>
+  <div className="brut-card p-6">
+    <h3 className="font-bold text-black text-base mb-4 uppercase tracking-wider">
+      Language Distribution
+    </h3>
+    <div className="max-w-xs mx-auto">
+      <Pie data={data} options={options} />
     </div>
-  )
+  </div>
+)
 }
 
 export default LanguageChart

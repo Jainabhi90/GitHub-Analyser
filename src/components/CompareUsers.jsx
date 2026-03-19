@@ -97,84 +97,118 @@ function CompareUsers() {
   const overallWinner = u1wins > u2wins
     ? user1 && user1.profile.login
     : u2wins > u1wins
-      ? user2 && user2.profile.login
-      : null
+    ? user2 && user2.profile.login
+    : null
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
 
-      <div className="bg-gray-800 rounded-2xl p-6">
-        <h2 className="text-white text-xl font-bold mb-4 text-center">
-          Compare Two GitHub Users
-        </h2>
+      {/* Input Section */}
+      <div className="brut-card p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="brut-tag-red">COMPARE</span>
+          <h2 className="text-2xl font-bold text-black">
+            Head to Head
+          </h2>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <input
             type="text"
             placeholder="First username..."
             value={username1}
             onChange={e => setUsername1(e.target.value)}
-            className="flex-1 px-4 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500"
+            className="brut-input flex-1 px-5 py-4 text-base font-medium"
           />
-          <span className="text-gray-400 font-bold text-xl">VS</span>
+
+          <div className="brut-card-dark px-6 py-4 flex-shrink-0">
+            <span className="text-yellow-400 font-black text-xl mono">VS</span>
+          </div>
+
           <input
             type="text"
             placeholder="Second username..."
             value={username2}
             onChange={e => setUsername2(e.target.value)}
-            className="flex-1 px-4 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500"
+            className="brut-input flex-1 px-5 py-4 text-base font-medium"
           />
+
           <button
             onClick={handleCompare}
-            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+            className="brut-btn px-8 py-4 text-base flex-shrink-0"
           >
-            Compare
+            Compare →
           </button>
         </div>
+
         {error && (
-          <p className="text-red-400 text-center mt-3">{error}</p>
+          <div className="mt-4 border-2 border-red-500 p-3">
+            <p className="text-red-600 text-sm font-medium">{error}</p>
+          </div>
         )}
       </div>
 
+      {/* Loading */}
       {loading && (
-        <div className="flex justify-center mt-8">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="w-12 h-12 border-4 border-black border-t-yellow-400 animate-spin" />
+          <p className="mono text-sm text-gray-600 uppercase tracking-widest">
+            Comparing developers...
+          </p>
         </div>
       )}
 
+      {/* Results */}
       {user1 && user2 && !loading && (
         <div className="space-y-6">
 
-          <div className="grid grid-cols-2 gap-6">
+          {/* Profile Cards Side by Side */}
+          <div className="grid grid-cols-2 gap-4">
             {[user1, user2].map((u, i) => (
-              <div
-                key={i}
-                className="bg-gray-800 rounded-2xl p-6 flex flex-col items-center text-center"
-              >
-                <img
-                  src={u.profile.avatar_url}
-                  alt={u.profile.login}
-                  className="w-20 h-20 rounded-full border-4 border-blue-500 mb-3"
-                />
-                <h3 className="text-white font-bold text-lg">
-                  {u.profile.name || u.profile.login}
-                </h3>
-                <p className="text-gray-400 text-sm">@{u.profile.login}</p>
-                {u.profile.bio && (
-                  <p className="text-gray-400 text-xs mt-2 line-clamp-2">
-                    {u.profile.bio}
+              <div key={i} className="brut-card p-0 overflow-hidden">
+                <div className="bg-black px-4 py-2">
+                  <span className="brut-tag text-xs">
+                    {i === 0 ? 'PLAYER 1' : 'PLAYER 2'}
+                  </span>
+                </div>
+                <div className="p-6 flex flex-col items-center text-center">
+                  <img
+                    src={u.profile.avatar_url}
+                    alt={u.profile.login}
+                    className="w-20 h-20 border-2 border-black mb-4"
+                  />
+                  <h3 className="font-bold text-black text-xl mb-1">
+                    {u.profile.name || u.profile.login}
+                  </h3>
+                  <p className="mono text-sm text-gray-500 mb-2">
+                    @{u.profile.login}
                   </p>
-                )}
+                  {u.profile.bio && (
+                    <p className="text-gray-600 text-xs line-clamp-2">
+                      {u.profile.bio}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="bg-gray-800 rounded-2xl overflow-hidden">
-            <div className="grid grid-cols-3 bg-gray-700 px-6 py-3 text-sm font-semibold text-gray-300">
-              <span>{user1.profile.login}</span>
-              <span className="text-center">Category</span>
-              <span className="text-right">{user2.profile.login}</span>
+          {/* Comparison Table */}
+          <div className="brut-card overflow-hidden">
+            {/* Header */}
+            <div className="grid grid-cols-3 bg-black px-6 py-4">
+              <span className="text-yellow-400 font-bold mono text-sm">
+                {user1.profile.login}
+              </span>
+              <span className="text-white font-bold text-sm text-center uppercase tracking-widest">
+                Category
+              </span>
+              <span className="text-yellow-400 font-bold mono text-sm text-right">
+                {user2.profile.login}
+              </span>
             </div>
 
+            {/* Rows */}
             {stats.map((stat, index) => {
               const user1Wins = !stat.isText && stat.v1 > stat.v2
               const user2Wins = !stat.isText && stat.v2 > stat.v1
@@ -182,28 +216,36 @@ function CompareUsers() {
               return (
                 <div
                   key={stat.label}
-                  className={`grid grid-cols-3 px-6 py-4 items-center ${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900'
-                    }`}
+                  className={`grid grid-cols-3 px-6 py-5 items-center border-b-2 border-black last:border-b-0 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                  }`}
                 >
+                  {/* User 1 */}
                   <div className="flex items-center gap-2">
-                    <span className="text-blue-400 font-bold">
-                      {typeof stat.v1 === 'number' ? stat.v1.toLocaleString() : stat.v1}
+                    <span className="mono text-xl font-bold text-black">
+                      {typeof stat.v1 === 'number'
+                        ? stat.v1.toLocaleString()
+                        : stat.v1}
                     </span>
                     {user1Wins && (
-                      <span className="text-yellow-400 text-lg">🏆</span>
+                      <span className="brut-tag text-xs">WIN</span>
                     )}
                   </div>
 
-                  <span className="text-gray-400 text-sm text-center">
+                  {/* Category */}
+                  <span className="text-gray-500 text-sm text-center uppercase tracking-wider font-medium">
                     {stat.label}
                   </span>
 
+                  {/* User 2 */}
                   <div className="flex items-center justify-end gap-2">
                     {user2Wins && (
-                      <span className="text-yellow-400 text-lg">🏆</span>
+                      <span className="brut-tag text-xs">WIN</span>
                     )}
-                    <span className="text-blue-400 font-bold">
-                      {typeof stat.v2 === 'number' ? stat.v2.toLocaleString() : stat.v2}
+                    <span className="mono text-xl font-bold text-black">
+                      {typeof stat.v2 === 'number'
+                        ? stat.v2.toLocaleString()
+                        : stat.v2}
                     </span>
                   </div>
                 </div>
@@ -211,19 +253,29 @@ function CompareUsers() {
             })}
           </div>
 
-          <div className="bg-gray-800 rounded-2xl p-6 text-center">
+          {/* Overall Winner */}
+          <div className={`p-8 text-center ${overallWinner ? 'brut-card-yellow' : 'brut-card'}`}>
             {overallWinner ? (
               <>
-                <p className="text-gray-400 mb-2">Overall Winner</p>
-                <p className="text-3xl font-bold text-yellow-400">
-                  🏆 {overallWinner}
+                <span className="brut-tag-dark mb-4 block mx-auto w-fit">
+                  OVERALL WINNER
+                </span>
+                <p className="text-5xl font-black text-black mb-2">
+                  {overallWinner}
                 </p>
-                <p className="text-gray-400 text-sm mt-2">
+                <p className="mono text-gray-800 text-base">
                   Won {Math.max(u1wins, u2wins)} out of {u1wins + u2wins} categories
                 </p>
               </>
             ) : (
-              <p className="text-gray-400 text-lg">Its a tie!</p>
+              <>
+                <span className="brut-tag mb-4 block mx-auto w-fit">
+                  RESULT
+                </span>
+                <p className="text-4xl font-black text-black">
+                  It's a Tie!
+                </p>
+              </>
             )}
           </div>
 

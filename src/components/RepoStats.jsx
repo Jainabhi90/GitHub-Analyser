@@ -1,64 +1,109 @@
 import { getTotalStars, getMostUsedLanguage, getTopRepo } from '../utils/dataProcessing'
 
-function RepoStats({ repos, user }) {
+function RepoStats({ repos }) {
   const totalStars = getTotalStars(repos)
   const topLanguage = getMostUsedLanguage(repos)
   const topRepo = getTopRepo(repos)
+  const totalForks = repos.reduce((sum, r) => sum + r.forks_count, 0)
+  const mostForked = repos.reduce((max, r) =>
+    r.forks_count > max.forks_count ? r : max, repos[0])
 
   const stats = [
     {
-      label: "Total Repos",
+      tag: "REPOS",
       value: repos.length,
-      icon: "📁",
-      link: null
+      label: "Public Repositories",
+      sub: `${repos.filter(r => r.fork).length} forks · ${repos.filter(r => !r.fork).length} original`,
     },
     {
-      label: "Total Stars",
+      tag: "STARS",
       value: totalStars.toLocaleString(),
-      icon: "⭐",
-      link: null
+      label: "Total Stars Earned",
+      sub: topRepo ? `Top: ${topRepo.name} (${topRepo.stargazers_count} ★)` : '',
     },
     {
-      label: "Top Language",
+      tag: "FORKS",
+      value: totalForks.toLocaleString(),
+      label: "Total Forks",
+      sub: mostForked ? `Most forked: ${mostForked.name}` : '',
+    },
+    {
+      tag: "LANGUAGE",
       value: topLanguage,
-      icon: "💻",
-      link: null
-    },
-    {
-      label: "Most Starred",
-      value: topRepo ? topRepo.name : "N/A",
-      icon: "🏆",
-      link: topRepo ? topRepo.html_url : null
+      label: "Top Language",
+      sub: `Across ${repos.filter(r => r.language === topLanguage).length} repos`,
     },
   ]
 
+  const topRepoData = getTopRepo(repos)
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto px-4">
-      {stats.map((stat, i) => (
-        <div
-          key={stat.label}
-          className="glass rounded-xl p-5 text-center card-hover animate-fadeInUp"
-          style={{
-            animationDelay: `${i * 0.1}s`,
-            background: 'linear-gradient(135deg, rgba(59,130,246,0.05), rgba(139,92,246,0.05))'
-          }}
-        >
-          <div className="text-2xl mb-2">{stat.icon}</div>
-          {stat.link ? (
-            <a
-              href={stat.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 text-lg font-bold hover:text-blue-300 transition hover:underline break-all"
-            >
+    <div className="space-y-4 max-w-4xl mx-auto">
+      {/* Main stats grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((stat, i) => (
+          <div
+            key={stat.tag}
+            className="brut-card p-6 animate-fadeInUp"
+            style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}
+          >
+            <span className="brut-tag mb-4 block">{stat.tag}</span>
+            <p className="mono text-3xl font-bold text-black mb-1">
               {stat.value}
-            </a>
-          ) : (
-            <p className="text-blue-400 text-xl font-bold">{stat.value}</p>
-          )}
-          <p className="text-gray-500 text-xs mt-1">{stat.label}</p>
-        </div>
-      ))}
+            </p>
+            <p className="text-sm font-medium text-black mb-2">
+              {stat.label}
+            </p>
+            {stat.sub && (
+              <p className="text-xs text-gray-500 mono leading-relaxed">
+                {stat.sub}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Top repo highlight */}
+      {topRepoData && (
+        <div className="brut-card-yellow p-6 animate-fadeInUp delay-400">
+  <div className="flex items-start justify-between flex-wrap gap-4">
+    <div>
+      <span className="brut-tag-dark mb-4 block">MOST STARRED REPO</span>
+      <a
+        href={topRepoData.html_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-3xl font-bold text-black hover:underline block mt-3"
+      >
+        {topRepoData.name} →
+      </a>
+      {topRepoData.description && (
+        <p className="text-gray-800 text-sm mt-3 max-w-lg">
+          {topRepoData.description}
+        </p>
+      )}
+    </div>
+    <div className="flex gap-8">
+      <div className="text-center">
+        <p className="mono text-4xl font-bold text-black">
+          {topRepoData.stargazers_count}
+        </p>
+        <p className="text-xs uppercase tracking-wider text-gray-700 mt-2">
+          Stars
+        </p>
+      </div>
+      <div className="text-center">
+        <p className="mono text-4xl font-bold text-black">
+          {topRepoData.forks_count}
+        </p>
+        <p className="text-xs uppercase tracking-wider text-gray-700 mt-2">
+          Forks
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+      )}
     </div>
   )
 }

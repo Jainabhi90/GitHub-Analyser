@@ -54,16 +54,17 @@ function RepoList({ repos }) {
   return (
     <div className="max-w-5xl mx-auto space-y-4">
 
-      <div className="flex flex-wrap gap-4 items-center bg-gray-800 rounded-xl px-6 py-4">
+      {/* Filter Bar */}
+      <div className="brut-card p-4 flex flex-wrap gap-3 items-center">
         <input
           type="text"
-          placeholder="Search all repos..."
+          placeholder="Search repos..."
           onChange={e => handleFilterChange('search', e.target.value)}
-          className="flex-1 min-w-48 px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500"
+          className="brut-input flex-1 min-w-48 px-4 py-2 text-sm"
         />
         <select
           onChange={e => handleFilterChange('sort', e.target.value)}
-          className="px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500"
+          className="brut-input px-3 py-2 text-sm font-medium"
         >
           <option value="stars">Sort: Stars</option>
           <option value="forks">Sort: Forks</option>
@@ -72,7 +73,7 @@ function RepoList({ repos }) {
         </select>
         <select
           onChange={e => handleFilterChange('language', e.target.value)}
-          className="px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-blue-500"
+          className="brut-input px-3 py-2 text-sm font-medium"
         >
           <option value="All">All Languages</option>
           {[...new Set(repos.map(r => r.language).filter(Boolean))].map(lang => (
@@ -81,16 +82,18 @@ function RepoList({ repos }) {
         </select>
       </div>
 
-      <p className="text-gray-400 text-sm px-1">
+      {/* Results count */}
+      <p className="text-xs text-gray-500 mono px-1 uppercase tracking-wider">
         {filters.search
-          ? `Showing ${filtered.length} of ${repos.length} repositories`
-          : `Showing top 20 repositories by stars — search to find more`
+          ? `Showing ${filtered.length} of ${repos.length} repos`
+          : `Top 20 repos by stars — search to find more`
         }
       </p>
 
+      {/* Repo Cards */}
       {filtered.length === 0 ? (
-        <div className="bg-gray-800 rounded-xl p-8 text-center text-gray-400">
-          No repositories match your filters
+        <div className="brut-card p-8 text-center">
+          <p className="text-gray-500">No repositories match your filters</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -100,26 +103,42 @@ function RepoList({ repos }) {
               href={repo.html_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-800 rounded-xl p-5 border border-gray-700 hover:border-blue-500 transition group"
+              className="brut-card p-5 block"
             >
-              <h3 className="text-blue-400 font-semibold text-lg group-hover:underline truncate">
-                {repo.name}
-              </h3>
-              <p className="text-gray-400 text-sm mt-1 mb-3 line-clamp-2 min-h-10">
+              {/* Repo name */}
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="font-bold text-black text-base hover:underline">
+                  {repo.name}
+                </h3>
+                {repo.stargazers_count > 0 && (
+                  <span className="brut-tag flex-shrink-0">
+                    {repo.stargazers_count} ★
+                  </span>
+                )}
+              </div>
+
+              {/* Description */}
+              <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-10">
                 {repo.description || 'No description provided'}
               </p>
-              <div className="flex items-center gap-4 text-sm text-gray-400">
+
+              {/* Footer */}
+              <div className="flex items-center gap-3 text-xs border-t-2 border-black pt-3">
                 {repo.language && (
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 font-medium">
                     <span
-                      className="w-3 h-3 rounded-full inline-block"
-                      style={{ backgroundColor: languageColors[repo.language] || '#888888' }}
+                      className="w-2.5 h-2.5 rounded-full border border-black"
+                      style={{
+                        backgroundColor: languageColors[repo.language] || '#888'
+                      }}
                     />
                     {repo.language}
                   </span>
                 )}
-                <span>{repo.stargazers_count} stars</span>
-                <span>{repo.forks_count} forks</span>
+                <span className="text-gray-500 mono">{repo.forks_count} forks</span>
+                <span className="ml-auto text-gray-400 mono">
+                  {new Date(repo.updated_at).toLocaleDateString()}
+                </span>
               </div>
             </a>
           ))}

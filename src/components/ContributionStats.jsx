@@ -4,74 +4,48 @@ function ContributionStats({ events }) {
   const { prs, commits, issues } = getContributionStats(events)
 
   const stats = [
-    {
-      label: "PRs Opened",
-      value: prs,
-      icon: "🔀",
-      description: "in last 90 events",
-      color: '#a78bfa',
-      bg: 'rgba(167,139,250,0.1)',
-      border: 'rgba(167,139,250,0.2)',
-      glow: 'rgba(167,139,250,0.15)'
-    },
-    {
-      label: "Commits",
-      value: commits,
-      icon: "📝",
-      description: "in last 30 days",
-      color: '#38bdf8',
-      bg: 'rgba(56,189,248,0.1)',
-      border: 'rgba(56,189,248,0.2)',
-      glow: 'rgba(56,189,248,0.15)'
-    },
-    {
-      label: "Issues Opened",
-      value: issues,
-      icon: "🐛",
-      description: "in last 90 events",
-      color: '#34d399',
-      bg: 'rgba(52,211,153,0.1)',
-      border: 'rgba(52,211,153,0.2)',
-      glow: 'rgba(52,211,153,0.15)'
-    },
+    { label: 'PRs Opened',    value: prs,     tag: 'PULL REQUESTS', sub: 'in last 90 events' },
+    { label: 'Commits',       value: commits, tag: 'COMMITS',       sub: 'in last 30 days'   },
+    { label: 'Issues Opened', value: issues,  tag: 'ISSUES',        sub: 'in last 90 events' },
   ]
 
   return (
     <div
-      className="rounded-2xl p-6 shadow-lg"
-      style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', border: '1px solid rgba(255,255,255,0.07)' }}
+      className="max-w-4xl mx-auto"
+      style={{ border: '3px solid #111', background: '#fff', margin: '2px' }}
     >
-      <h3 className="text-white text-lg font-semibold mb-6">
-        Contributions Overview
-      </h3>
+      {/* Header */}
+      <div style={{ background: '#111', padding: '10px 20px' }}>
+        <span style={{ color: '#f0ebe0', fontFamily: 'Space Mono, monospace', fontSize: '11px', letterSpacing: '3px' }}>
+          // CONTRIBUTIONS OVERVIEW
+        </span>
+      </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        {stats.map(stat => (
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        {stats.map((stat, i) => (
           <div
             key={stat.label}
-            className="rounded-xl p-5 text-center transition-all duration-300 hover:-translate-y-1"
             style={{
-              background: stat.bg,
-              border: `1px solid ${stat.border}`,
-              boxShadow: `0 4px 20px ${stat.glow}`
+              padding: '24px',
+              borderRight: i < 2 ? '2px solid #111' : 'none',
+              textAlign: 'center'
             }}
           >
-            <div className="text-3xl mb-3">{stat.icon}</div>
-            <p
-              className="text-4xl font-bold mb-1 font-mono"
-              style={{
-                color: stat.color,
-                textShadow: `0 0 20px ${stat.color}`
-              }}
-            >
+            <div style={{ marginBottom: '12px' }}>
+              <span style={{ background: '#e8c547', color: '#111', fontSize: '9px', fontWeight: '800', letterSpacing: '3px', padding: '3px 10px', fontFamily: 'Space Mono, monospace', border: '1.5px solid #111' }}>
+                {stat.tag}
+              </span>
+            </div>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '48px', fontWeight: '700', color: '#111', lineHeight: 1, marginBottom: '8px' }}>
               {stat.value}
-            </p>
-            <p className="text-white text-sm font-medium mb-1">
+            </div>
+            <div style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '14px', fontWeight: '600', color: '#111', marginBottom: '4px' }}>
               {stat.label}
-            </p>
-            <p className="text-gray-600 text-xs">
-              {stat.description}
-            </p>
+            </div>
+            <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '11px', color: '#888' }}>
+              {stat.sub}
+            </div>
           </div>
         ))}
       </div>

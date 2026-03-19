@@ -1,65 +1,85 @@
 function ProfileCard({ user }) {
   return (
-    <div className="glass rounded-2xl p-8 max-w-sm mx-auto card-hover animate-fadeInUp"
-      style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))' }}
-    >
-      <div className="flex flex-col items-center">
-        <div className="relative mb-4">
+    <div className="brut-card rounded-none p-0 max-w-2xl mx-auto overflow-hidden">
+
+      {/* Top bar */}
+      <div className="bg-black px-6 py-2 flex items-center justify-between">
+        <span className="brut-tag-dark text-xs">PROFILE</span>
+        <span className="text-gray-400 text-xs mono">github.com/{user.login}</span>
+      </div>
+
+      <div className="p-6 flex flex-col md:flex-row gap-6 items-start">
+
+        {/* Avatar */}
+        <div className="flex-shrink-0">
           <img
             src={user.avatar_url}
             alt={user.login}
-            className="w-28 h-28 rounded-full border-4 border-blue-500 animate-pulse-glow"
-          />
-          <div className="absolute inset-0 rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.2), transparent)' }}
+            className="w-28 h-28 border-2 border-black"
+            style={{ filter: 'grayscale(10%)' }}
           />
         </div>
 
-        <h2 className="text-2xl font-bold text-white mb-1">
-          {user.name || user.login}
-        </h2>
-        <p className="text-blue-400 mb-3">@{user.login}</p>
-
-        {user.bio && (
-          <p className="text-gray-400 text-center text-sm mb-4 leading-relaxed">
-            {user.bio}
-          </p>
-        )}
-
-        {user.location && (
-          <p className="text-gray-500 text-sm mb-4">
-            📍 {user.location}
-          </p>
-        )}
-
-        <div className="flex gap-8 mt-2">
-          <div className="text-center">
-            <p className="text-white font-bold text-xl">
-              {user.followers.toLocaleString()}
-            </p>
-            <p className="text-gray-500 text-xs mt-1">Followers</p>
+        {/* Info */}
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-1 flex-wrap">
+            <h2 className="text-2xl font-bold text-black">
+              {user.name || user.login}
+            </h2>
+            <span className="brut-tag">Developer</span>
           </div>
-          <div className="text-center">
-            <p className="text-white font-bold text-xl">
-              {user.following.toLocaleString()}
+
+          <p className="mono text-sm text-gray-600 mb-3">
+            @{user.login}
+          </p>
+
+          {user.bio && (
+            <p className="text-gray-700 text-sm leading-relaxed mb-4 max-w-md">
+              {user.bio}
             </p>
-            <p className="text-gray-500 text-xs mt-1">Following</p>
-          </div>
-          <div className="text-center">
-            <p className="text-white font-bold text-xl">
-              {user.public_repos}
+          )}
+
+          {user.location && (
+            <p className="text-gray-500 text-xs mb-4">
+              📍 {user.location}
             </p>
-            <p className="text-gray-500 text-xs mt-1">Repos</p>
+          )}
+
+          {/* Stats row */}
+          <div className="flex gap-0 border-t-2 border-black mt-4 pt-4">
+            {[
+              { label: 'Followers', value: user.followers.toLocaleString() },
+              { label: 'Following', value: user.following.toLocaleString() },
+              { label: 'Repos', value: user.public_repos },
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                className={`flex-1 text-center ${i < 2 ? 'border-r-2 border-black' : ''}`}
+              >
+                <p className="mono text-xl font-bold text-black">
+                  {stat.value}
+                </p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mt-0.5">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
+      </div>
 
+      {/* Bottom bar */}
+      <div className="border-t-2 border-black px-6 py-3 flex justify-between items-center bg-gray-50">
+        <span className="text-xs text-gray-500 mono">
+          Member since {new Date(user.created_at).getFullYear()}
+        </span>
         <a
           href={`https://github.com/${user.login}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30"
+          className="brut-btn-outline px-4 py-1.5 text-xs"
         >
-          View on GitHub
+          View on GitHub →
         </a>
       </div>
     </div>

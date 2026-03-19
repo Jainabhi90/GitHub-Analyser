@@ -10,7 +10,8 @@ function ActivityHeatmap({ username }) {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch(`/api/contributions?username=${username}`)
+       const baseUrl = import.meta.env.VITE_API_URL || ''
+const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
         const json = await res.json()
         if (json.error) throw new Error(json.error)
         setData(json)

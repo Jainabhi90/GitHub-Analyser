@@ -18,16 +18,16 @@ function StarChart({ repos }) {
 
   const data = {
     labels,
-    datasets: [
-      {
-        label: 'Stars',
-        data: values,
-        backgroundColor: '#3B82F6',
-        borderColor: '#2563EB',
-        borderWidth: 1,
-        borderRadius: 6,
-      }
-    ]
+   datasets: [
+  {
+    label: 'Stars',
+    data: values,
+    backgroundColor: '#f5a623',
+    borderColor: '#0a0a0a',
+    borderWidth: 2,
+    borderRadius: 0,
+  }
+]
   }
 
   const options = {
@@ -44,12 +44,12 @@ function StarChart({ repos }) {
     },
     scales: {
       x: {
-        ticks: { color: '#D1D5DB' },
-        grid: { color: '#374151' }
+        ticks: { color: '#0a0a0a', font: { family: 'Space Mono' } },
+        grid: { color: 'rgba(0,0,0,0.08)' }
       },
       y: {
-        ticks: { color: '#D1D5DB' },
-        grid: { color: '#374151' },
+        ticks: { color: '#0a0a0a', font: { family: 'Space Mono' } },
+        grid: { color: 'rgba(0,0,0,0.08)' },
         beginAtZero: true
       }
     }
@@ -64,13 +64,13 @@ function StarChart({ repos }) {
   }
 
   return (
-    <div className="bg-gray-800 rounded-2xl p-6 shadow-lg">
-      <h3 className="text-white text-lg font-semibold mb-4 text-center">
-        Top 5 Repos by Stars
-      </h3>
-      <Bar data={data} options={options} />
-    </div>
-  )
+  <div className="brut-card p-6">
+    <h3 className="font-bold text-black text-base mb-4 uppercase tracking-wider">
+      Top 5 Repos by Stars
+    </h3>
+    <Bar data={data} options={options} />
+  </div>
+)
 }
 
 export default StarChart

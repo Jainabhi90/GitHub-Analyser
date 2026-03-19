@@ -10,19 +10,9 @@ import {
   Filler
 } from 'chart.js'
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  Filler
-)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler)
 
 function ActivityGraph({ events }) {
-
-  // Step 1: Generate last 30 days as labels
   const last30Days = []
   for (let i = 29; i >= 0; i--) {
     const date = new Date()
@@ -30,22 +20,20 @@ function ActivityGraph({ events }) {
     last30Days.push(date.toISOString().split('T')[0])
   }
 
-  // Step 2: Count PushEvents per day
   const activityMap = {}
   last30Days.forEach(day => activityMap[day] = 0)
 
   events
-    .filter(event => event.type === 'PushEvent')
-    .forEach(event => {
-      const date = event.created_at.split('T')[0]
+    .filter(e => e.type === 'PushEvent')
+    .forEach(e => {
+      const date = e.created_at.split('T')[0]
       if (activityMap[date] !== undefined) {
         activityMap[date] += 1
       }
     })
 
-  // Step 3: Format labels for display (show only every 5th day)
-  const labels = last30Days.map((date, index) => {
-    if (index % 5 === 0) {
+  const labels = last30Days.map((date, i) => {
+    if (i % 5 === 0) {
       const d = new Date(date)
       return `${d.getMonth() + 1}/${d.getDate()}`
     }
@@ -53,6 +41,8 @@ function ActivityGraph({ events }) {
   })
 
   const values = last30Days.map(day => activityMap[day])
+  const totalPushes = values.reduce((a, b) => a + b, 0)
+  const activeDays = values.filter(v => v > 0).length
 
   const data = {
     labels,
@@ -60,10 +50,12 @@ function ActivityGraph({ events }) {
       {
         label: 'Push Events',
         data: values,
-        borderColor: '#3B82F6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        borderWidth: 2,
-        pointBackgroundColor: '#3B82F6',
+        borderColor: '#111111',
+        backgroundColor: 'rgba(17,17,17,0.05)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#e8c547',
+        pointBorderColor: '#111',
+        pointBorderWidth: 2,
         pointRadius: 3,
         pointHoverRadius: 6,
         tension: 0.4,
@@ -75,77 +67,57 @@ function ActivityGraph({ events }) {
   const options = {
     responsive: true,
     plugins: {
-      legend: {
-        display: false
-      },
+      legend: { display: false },
       tooltip: {
+        backgroundColor: '#111',
+        titleColor: '#e8c547',
+        bodyColor: '#f0ebe0',
+        borderColor: '#111',
+        borderWidth: 1,
         callbacks: {
-          title: (items) => {
-            const index = items[0].dataIndex
-            return last30Days[index]
-          },
-          label: (item) => ` ${item.parsed.y} push events`
+          title: items => last30Days[items[0].dataIndex],
+          label: item => ` ${item.parsed.y} push events`
         }
       }
     },
     scales: {
       x: {
-        ticks: {
-          color: '#9CA3AF',
-          font: { size: 11 }
-        },
-        grid: {
-          color: '#374151'
-        }
+        ticks: { color: '#888', font: { family: 'Space Mono, monospace', size: 10 } },
+        grid: { color: 'rgba(0,0,0,0.06)' },
+        border: { color: '#111', width: 2 }
       },
       y: {
         beginAtZero: true,
-        ticks: {
-          color: '#9CA3AF',
-          stepSize: 1,
-          font: { size: 11 }
-        },
-        grid: {
-          color: '#374151'
-        }
+        ticks: { color: '#888', stepSize: 1, font: { family: 'Space Mono, monospace', size: 10 } },
+        grid: { color: 'rgba(0,0,0,0.06)' },
+        border: { color: '#111', width: 2 }
       }
     }
   }
 
-  const totalPushes = values.reduce((a, b) => a + b, 0)
-  const activeDays = values.filter(v => v > 0).length
-
-  if (totalPushes === 0) {
-    return (
-      <div className="bg-gray-800 rounded-2xl p-6 shadow-lg">
-        <h3 className="text-white text-lg font-semibold mb-2">
-          Activity — Last 30 Days
-        </h3>
-        <div className="text-center text-gray-400 py-8">
-          No push activity in the last 30 days
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="bg-gray-800 rounded-2xl p-6 shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-white text-lg font-semibold">
-          Activity — Last 30 Days
-        </h3>
-        <div className="flex gap-4 text-sm">
-          <span className="text-gray-400">
-            Total pushes:
-            <span className="text-blue-400 font-bold ml-1">{totalPushes}</span>
+    <div
+      className="max-w-4xl mx-auto"
+      style={{ border: '3px solid #111', background: '#fff', margin: '2px' }}
+    >
+      {/* Header */}
+      <div style={{ background: '#111', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ color: '#f0ebe0', fontFamily: 'Space Mono, monospace', fontSize: '11px', letterSpacing: '3px' }}>
+          // ACTIVITY — LAST 30 DAYS
+        </span>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '11px', color: '#888' }}>
+            Pushes: <span style={{ color: '#e8c547', fontWeight: '700' }}>{totalPushes}</span>
           </span>
-          <span className="text-gray-400">
-            Active days:
-            <span className="text-green-400 font-bold ml-1">{activeDays}</span>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '11px', color: '#888' }}>
+            Active days: <span style={{ color: '#e8c547', fontWeight: '700' }}>{activeDays}</span>
           </span>
         </div>
       </div>
-      <Line data={data} options={options} />
+
+      <div style={{ padding: '24px' }}>
+        <Line data={data} options={options} />
+      </div>
     </div>
   )
 }
