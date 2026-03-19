@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { fetchUser, fetchRepos, fetchEvents } from '../services/githubApi'
-import { getTotalStars, getMostUsedLanguage } from '../utils/dataProcessing'
+import { getTotalStars, getMostUsedLanguage, getTotalPRs, getTotalCommits, getTotalIssues } from '../utils/dataProcessing'
 
 function CompareUsers() {
   const [username1, setUsername1] = useState('')
@@ -50,7 +50,10 @@ function CompareUsers() {
         repos: r1,
         totalStars: getTotalStars(r1),
         topLanguage: getMostUsedLanguage(r1),
-        activeDays: getActiveDays(e1)
+        activeDays: getActiveDays(e1),
+        prs: getTotalPRs(e1),
+        commits: getTotalCommits(e1),
+        issues: getTotalIssues(e1),
       })
 
       setUser2({
@@ -58,7 +61,10 @@ function CompareUsers() {
         repos: r2,
         totalStars: getTotalStars(r2),
         topLanguage: getMostUsedLanguage(r2),
-        activeDays: getActiveDays(e2)
+        activeDays: getActiveDays(e2),
+        prs: getTotalPRs(e2),
+        commits: getTotalCommits(e2),
+        issues: getTotalIssues(e2),
       })
 
     } catch (err) {
@@ -74,6 +80,9 @@ function CompareUsers() {
     { label: 'Total Stars', v1: user1.totalStars, v2: user2.totalStars },
     { label: 'Top Language', v1: user1.topLanguage, v2: user2.topLanguage, isText: true },
     { label: 'Active Days (30d)', v1: user1.activeDays, v2: user2.activeDays },
+    { label: 'PRs Opened', v1: user1.prs, v2: user2.prs },
+    { label: 'Commits (30d)', v1: user1.commits, v2: user2.commits },
+    { label: 'Issues Opened', v1: user1.issues, v2: user2.issues },
   ] : []
 
   let u1wins = 0
@@ -88,8 +97,8 @@ function CompareUsers() {
   const overallWinner = u1wins > u2wins
     ? user1 && user1.profile.login
     : u2wins > u1wins
-    ? user2 && user2.profile.login
-    : null
+      ? user2 && user2.profile.login
+      : null
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -173,9 +182,8 @@ function CompareUsers() {
               return (
                 <div
                   key={stat.label}
-                  className={`grid grid-cols-3 px-6 py-4 items-center ${
-                    index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900'
-                  }`}
+                  className={`grid grid-cols-3 px-6 py-4 items-center ${index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-900'
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-blue-400 font-bold">
