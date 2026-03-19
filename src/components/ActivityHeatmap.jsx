@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-function ActivityHeatmap({ username }) {
+function ActivityHeatmap({ username, onContributionsLoaded }) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -10,11 +10,14 @@ function ActivityHeatmap({ username }) {
       setLoading(true)
       setError(null)
       try {
-       const baseUrl = import.meta.env.VITE_API_URL || ''
-const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
+        const baseUrl = import.meta.env.VITE_API_URL || ''
+        const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
         const json = await res.json()
         if (json.error) throw new Error(json.error)
         setData(json)
+        if (onContributionsLoaded) {
+          onContributionsLoaded(json.totalContributions)
+        }
       } catch (err) {
         setError(err.message)
       } finally {
@@ -26,13 +29,17 @@ const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
 
   if (loading) {
     return (
-      <div
-        className="rounded-2xl p-6 shadow-lg flex items-center justify-center h-48"
-        style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1px solid rgba(255,255,255,0.07)' }}
-      >
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-500 text-sm">Loading contributions...</p>
+      <div className="max-w-4xl mx-auto" style={{ border: '3px solid #111', background: '#fff', margin: '2px' }}>
+        <div style={{ background: '#111', padding: '10px 20px' }}>
+          <span style={{ color: '#f0ebe0', fontFamily: 'Space Mono, monospace', fontSize: '11px', letterSpacing: '3px' }}>
+            // CONTRIBUTION HEATMAP
+          </span>
+        </div>
+        <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <div className="w-8 h-8 border-4 border-black border-t-yellow-400 animate-spin" />
+          <p style={{ fontFamily: 'Space Mono, monospace', fontSize: '11px', color: '#888', letterSpacing: '2px' }}>
+            LOADING HEATMAP...
+          </p>
         </div>
       </div>
     )
@@ -40,12 +47,15 @@ const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
 
   if (error) {
     return (
-      <div
-        className="rounded-2xl p-6 shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1px solid rgba(255,255,255,0.07)' }}
-      >
-        <h3 className="text-white text-lg font-semibold mb-2">Activity Heatmap</h3>
-        <p className="text-red-400 text-sm">{error}</p>
+      <div className="max-w-4xl mx-auto" style={{ border: '3px solid #111', background: '#fff', margin: '2px' }}>
+        <div style={{ background: '#111', padding: '10px 20px' }}>
+          <span style={{ color: '#f0ebe0', fontFamily: 'Space Mono, monospace', fontSize: '11px', letterSpacing: '3px' }}>
+            // CONTRIBUTION HEATMAP
+          </span>
+        </div>
+        <div style={{ padding: '24px' }}>
+          <p style={{ color: '#e8442a', fontFamily: 'Space Mono, monospace', fontSize: '12px' }}>{error}</p>
+        </div>
       </div>
     )
   }
@@ -54,13 +64,10 @@ const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
 
   const weeks = data.weeks
   const totalContributions = data.totalContributions
-
-  // Count active days
   const activeDays = weeks.reduce((total, week) =>
     total + week.contributionDays.filter(d => d.contributionCount > 0).length
   , 0)
 
-  // Month labels
   const monthLabels = []
   let lastMonth = -1
   weeks.forEach((week, wi) => {
@@ -68,8 +75,7 @@ const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
     if (!firstDay) return
     const month = new Date(firstDay.date).getMonth()
     if (month !== lastMonth) {
-      monthLabels[wi] = new Date(firstDay.date)
-        .toLocaleString('default', { month: 'short' })
+      monthLabels[wi] = new Date(firstDay.date).toLocaleString('default', { month: 'short' })
       lastMonth = month
     }
   })
@@ -77,43 +83,32 @@ const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   return (
-    <div
-      className="rounded-2xl p-6 shadow-lg"
-      style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1px solid rgba(255,255,255,0.07)' }}
-    >
+    <div className="max-w-4xl mx-auto" style={{ border: '3px solid #111', background: '#fff', margin: '2px' }}>
+
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h3 className="text-white text-lg font-semibold">
-            Activity Heatmap
-          </h3>
-          <p className="text-gray-600 text-xs mt-0.5">Last 12 months</p>
-        </div>
-        <div className="flex gap-6 text-sm">
-          <div className="text-center">
-            <p className="text-green-400 font-bold text-lg font-mono">
-              {totalContributions.toLocaleString()}
-            </p>
-            <p className="text-gray-600 text-xs">Total Contributions</p>
-          </div>
-          <div className="text-center">
-            <p className="text-blue-400 font-bold text-lg font-mono">
-              {activeDays}
-            </p>
-            <p className="text-gray-600 text-xs">Active Days</p>
-          </div>
+      <div style={{ background: '#111', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ color: '#f0ebe0', fontFamily: 'Space Mono, monospace', fontSize: '11px', letterSpacing: '3px' }}>
+          // CONTRIBUTION HEATMAP — LAST 12 MONTHS
+        </span>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '11px', color: '#888' }}>
+            Total: <span style={{ color: '#e8c547', fontWeight: '700' }}>{totalContributions.toLocaleString()}</span>
+          </span>
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '11px', color: '#888' }}>
+            Active days: <span style={{ color: '#e8c547', fontWeight: '700' }}>{activeDays}</span>
+          </span>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <div className="min-w-max">
+      <div style={{ padding: '20px', overflowX: 'auto' }}>
+        <div style={{ minWidth: 'max-content' }}>
 
           {/* Month labels */}
-          <div className="flex gap-1 mb-1 ml-8">
+          <div style={{ display: 'flex', gap: '4px', marginBottom: '4px', marginLeft: '32px' }}>
             {weeks.map((_, wi) => (
-              <div key={wi} className="w-3 text-center">
+              <div key={wi} style={{ width: '12px', textAlign: 'center' }}>
                 {monthLabels[wi] && (
-                  <span className="text-gray-600 text-xs">
+                  <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: '#888' }}>
                     {monthLabels[wi]}
                   </span>
                 )}
@@ -121,38 +116,42 @@ const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
             ))}
           </div>
 
-          <div className="flex gap-1">
+          <div style={{ display: 'flex', gap: '4px' }}>
+
             {/* Day labels */}
-            <div className="flex flex-col gap-1 mr-1">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginRight: '4px' }}>
               {dayLabels.map((d, i) => (
-                <div key={d} className="h-3 flex items-center">
+                <div key={d} style={{ height: '12px', display: 'flex', alignItems: 'center' }}>
                   {i % 2 === 1 ? (
-                    <span className="text-gray-700 text-xs w-6 text-right pr-1">
+                    <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '9px', color: '#888', width: '24px', textAlign: 'right' }}>
                       {d}
                     </span>
                   ) : (
-                    <span className="w-6" />
+                    <span style={{ width: '24px' }} />
                   )}
                 </div>
               ))}
             </div>
 
-            {/* Heatmap grid */}
+            {/* Grid */}
             {weeks.map((week, wi) => (
-              <div key={wi} className="flex flex-col gap-1">
+              <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {week.contributionDays.map((day, di) => {
                   const count = day.contributionCount
-                  const hasActivity = count > 0
-
                   return (
                     <div
                       key={di}
-                      className="w-3 h-3 rounded-sm cursor-pointer transition-transform duration-150 hover:scale-150"
-                      style={{
-                        backgroundColor: hasActivity ? day.color : 'rgba(255,255,255,0.05)',
-                        boxShadow: hasActivity ? `0 0 6px ${day.color}88` : 'none'
-                      }}
                       title={`${day.date}: ${count} contribution${count !== 1 ? 's' : ''}`}
+                      style={{
+                        width: '12px',
+                        height: '12px',
+                        background: count > 0 ? day.color : 'rgba(0,0,0,0.06)',
+                        border: '1px solid rgba(0,0,0,0.1)',
+                        cursor: 'pointer',
+                        transition: 'transform 0.1s ease'
+                      }}
+                      onMouseEnter={e => e.target.style.transform = 'scale(1.4)'}
+                      onMouseLeave={e => e.target.style.transform = 'scale(1)'}
                     />
                   )
                 })}
@@ -161,25 +160,12 @@ const res = await fetch(`${baseUrl}/api/contributions?username=${username}`)
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-end gap-2 mt-4">
-            <span className="text-gray-600 text-xs">Less</span>
-            {[
-              'rgba(255,255,255,0.05)',
-              '#0e4429',
-              '#006d32',
-              '#26a641',
-              '#39d353'
-            ].map((color, i) => (
-              <div
-                key={i}
-                className="w-3 h-3 rounded-sm"
-                style={{
-                  backgroundColor: color,
-                  boxShadow: i > 0 ? `0 0 4px ${color}` : 'none'
-                }}
-              />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px', justifyContent: 'flex-end' }}>
+            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: '#888' }}>Less</span>
+            {['rgba(0,0,0,0.06)', '#0e4429', '#006d32', '#26a641', '#39d353'].map((color, i) => (
+              <div key={i} style={{ width: '12px', height: '12px', background: color, border: '1px solid rgba(0,0,0,0.1)' }} />
             ))}
-            <span className="text-gray-600 text-xs">More</span>
+            <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', color: '#888' }}>More</span>
           </div>
 
         </div>

@@ -20,6 +20,7 @@ function Dashboard() {
   const [error, setError] = useState(null)
   const [history, setHistory] = useState([])
   const [mode, setMode] = useState('search')
+  const [realCommits, setRealCommits] = useState(null)
 
   async function handleSearch(username) {
     setLoading(true)
@@ -27,6 +28,7 @@ function Dashboard() {
     setUser(null)
     setRepos([])
     setEvents([])
+    setRealCommits(null)
 
     try {
       const [userData, reposData, eventsData] = await Promise.all([
@@ -51,10 +53,9 @@ function Dashboard() {
   }
 
   function SectionHeading({ label, count }) {
-  return (
-    <div className="flex items-center gap-4 mb-8">
-      <span
-        style={{
+    return (
+      <div className="flex items-center gap-4 mb-8">
+        <span style={{
           background: '#111',
           color: '#f5f0e8',
           fontSize: '13px',
@@ -65,19 +66,18 @@ function Dashboard() {
           border: '2px solid #111',
           boxShadow: '3px 3px 0px #e8c547',
           whiteSpace: 'nowrap'
-        }}
-      >
-        {label}
-      </span>
-      {count && (
-        <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '13px', color: '#aaa' }}>
-          {count}
+        }}>
+          {label}
         </span>
-      )}
-      <div style={{ flex: 1, height: '2px', background: '#111', opacity: 0.12 }} />
-    </div>
-  )
-}
+        {count && (
+          <span style={{ fontFamily: 'Space Mono, monospace', fontSize: '13px', color: '#aaa' }}>
+            {count}
+          </span>
+        )}
+        <div style={{ flex: 1, height: '2px', background: '#111', opacity: 0.12 }} />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen" style={{ background: '#f5f0e8' }}>
@@ -117,10 +117,7 @@ function Dashboard() {
 
         {/* Mode Toggle */}
         <div className="flex justify-center mb-10 animate-fadeInUp">
-          <div
-            className="flex border-2 border-black"
-            style={{ boxShadow: '4px 4px 0px #0a0a0a' }}
-          >
+          <div className="flex border-2 border-black" style={{ boxShadow: '4px 4px 0px #0a0a0a' }}>
             <button
               onClick={() => setMode('search')}
               className={`px-10 py-4 text-sm font-bold uppercase tracking-widest border-r-2 border-black transition-all duration-150 ${
@@ -251,7 +248,10 @@ function Dashboard() {
 
                     <div className="animate-fadeInUp delay-300">
                       <SectionHeading label="CONTRIBUTIONS" />
-                      <ContributionStats events={events} />
+                      <ContributionStats
+                        events={events}
+                        realCommits={realCommits}
+                      />
                     </div>
 
                     <div className="brut-divider" />
@@ -265,7 +265,10 @@ function Dashboard() {
 
                     <div className="animate-fadeInUp delay-400">
                       <SectionHeading label="CONTRIBUTION HEATMAP" />
-                      <ActivityHeatmap username={user.login} />
+                      <ActivityHeatmap
+                        username={user.login}
+                        onContributionsLoaded={(total) => setRealCommits(total)}
+                      />
                     </div>
 
                     <div className="brut-divider" />

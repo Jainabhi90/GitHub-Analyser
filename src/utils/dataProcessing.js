@@ -39,15 +39,11 @@ export function getTotalPRs(events) {
 }
 
 export function getTotalCommits(events) {
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
+  // Count ALL push event commits — no date filter
+  // since GitHub API only gives last 90 events anyway
   return events
-    .filter(e => {
-      if (e.type !== 'PushEvent') return false
-      return new Date(e.created_at) >= thirtyDaysAgo
-    })
-    .reduce((total, e) => total + (e.payload.commits?.length || 0), 0)
+    .filter(e => e.type === 'PushEvent')
+    .reduce((total, e) => total + (e.payload?.commits?.length || 0), 0)
 }
 
 export function getTotalIssues(events) {
