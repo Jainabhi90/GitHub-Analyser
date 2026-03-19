@@ -9,6 +9,8 @@ import ActivityGraph from '../components/ActivityGraph'
 import CompareUsers from '../components/CompareUsers'
 import ContributionStats from '../components/ContributionStats'
 import { fetchUser, fetchRepos, fetchEvents } from '../services/githubApi'
+import ActivityHeatmap from '../components/ActivityHeatmap'
+import DeveloperScore from '../components/DeveloperScore'
 
 function Dashboard() {
   const [user, setUser] = useState(null)
@@ -63,21 +65,19 @@ function Dashboard() {
       <div className="flex justify-center gap-3 mb-8">
         <button
           onClick={() => setMode('search')}
-          className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
-            mode === 'search'
+          className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${mode === 'search'
               ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
               : 'glass text-gray-300 hover:text-white'
-          }`}
+            }`}
         >
           Search User
         </button>
         <button
           onClick={() => setMode('compare')}
-          className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
-            mode === 'compare'
+          className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${mode === 'compare'
               ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
               : 'glass text-gray-300 hover:text-white'
-          }`}
+            }`}
         >
           Compare Users
         </button>
@@ -149,6 +149,14 @@ function Dashboard() {
 
               {repos.length > 0 && (
                 <>
+                  {/* Developer Score */}
+                  <DeveloperScore
+                    user={user}
+                    repos={repos}
+                    events={events}
+                  />
+
+                  {/* Charts */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <LanguageChart repos={repos} />
                     <StarChart repos={repos} />
@@ -159,6 +167,9 @@ function Dashboard() {
 
                   {/* Activity Graph */}
                   <ActivityGraph events={events} />
+
+                  {/* Activity Heatmap */}
+                  <ActivityHeatmap username={user.login} />
 
                   {/* Repo List */}
                   <div>
