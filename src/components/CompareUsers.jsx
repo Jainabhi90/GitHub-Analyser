@@ -26,55 +26,59 @@ function CompareUsers() {
   }
 
   async function handleCompare() {
-    if (!username1.trim() || !username2.trim()) {
-      setError('Please enter both usernames')
-      return
-    }
-    setLoading(true)
-    setError(null)
-    setUser1(null)
-    setUser2(null)
-
-    try {
-      const [u1, u2, r1, r2, e1, e2] = await Promise.all([
-        fetchUser(username1.trim()),
-        fetchUser(username2.trim()),
-        fetchRepos(username1.trim()),
-        fetchRepos(username2.trim()),
-        fetchEvents(username1.trim()),
-        fetchEvents(username2.trim()),
-        fetch(`/api/contributions?username=${username1.trim()}`).then(r => r.json()),
-      fetch(`/api/contributions?username=${username2.trim()}`).then(r => r.json()),
-      ])
-
-      setUser1({
-        profile: u1,
-        repos: r1,
-        totalStars: getTotalStars(r1),
-        topLanguage: getMostUsedLanguage(r1),
-        activeDays: getActiveDays(e1),
-        prs: getTotalPRs(e1),
-        commits: getTotalCommits(e1),
-        issues: getTotalIssues(e1),
-      })
-
-      setUser2({
-        profile: u2,
-        repos: r2,
-        totalStars: getTotalStars(r2),
-        topLanguage: getMostUsedLanguage(r2),
-        activeDays: getActiveDays(e2),
-        prs: getTotalPRs(e2),
-        commits: getTotalCommits(e2),
-        issues: getTotalIssues(e2),
-      })
-
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
+  if (!username1.trim() || !username2.trim()) {
+    setError('Please enter both usernames')
+    return
   }
+  setLoading(true)
+  setError(null)
+  setUser1(null)
+  setUser2(null)
+
+  try {
+    const [u1, u2, r1, r2, e1, e2, c1, c2] = await Promise.all([
+      fetchUser(username1.trim()),
+      fetchUser(username2.trim()),
+      fetchRepos(username1.trim()),
+      fetchRepos(username2.trim()),
+      fetchEvents(username1.trim()),
+      fetchEvents(username2.trim()),
+      fetch(`/api/contributions?username=${username1.trim()}`)
+        .then(r => r.json())
+        .catch(() => ({ totalContributions: 0 })),
+      fetch(`/api/contributions?username=${username2.trim()}`)
+        .then(r => r.json())
+        .catch(() => ({ totalContributions: 0 })),
+    ])
+
+    setUser1({
+      profile: u1,
+      repos: r1,
+      totalStars: getTotalStars(r1),
+      topLanguage: getMostUsedLanguage(r1),
+      activeDays: getActiveDays(e1),
+      prs: getTotalPRs(e1),
+      commits: c1.totalContributions ?? 0,
+      issues: getTotalIssues(e1),
+    })
+
+    setUser2({
+      profile: u2,
+      repos: r2,
+      totalStars: getTotalStars(r2),
+      topLanguage: getMostUsedLanguage(r2),
+      activeDays: getActiveDays(e2),
+      prs: getTotalPRs(e2),
+      commits: c2.totalContributions ?? 0,
+      issues: getTotalIssues(e2),
+    })
+
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
 
   const stats = user1 && user2 ? [
     { label: 'Followers', v1: user1.profile.followers, v2: user2.profile.followers },
@@ -99,58 +103,58 @@ function CompareUsers() {
   const overallWinner = u1wins > u2wins
     ? user1 && user1.profile.login
     : u2wins > u1wins
-    ? user2 && user2.profile.login
-    : null
+      ? user2 && user2.profile.login
+      : null
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
 
       {/* Input Section */}
-<div className="brut-card p-8">
-  <div className="flex items-center gap-3 mb-6">
-    <span className="brut-tag-red">COMPARE</span>
-    <h2 className="text-2xl font-bold text-black">
-      Head to Head
-    </h2>
-  </div>
+      <div className="brut-card p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="brut-tag-red">COMPARE</span>
+          <h2 className="text-2xl font-bold text-black">
+            Head to Head
+          </h2>
+        </div>
 
-  <div className="flex flex-col md:flex-row gap-4 items-center">
-    <input
-      type="text"
-      placeholder="First username..."
-      value={username1}
-      onChange={e => setUsername1(e.target.value)}
-      onKeyDown={e => e.key === 'Enter' && handleCompare()}
-      className="brut-input flex-1 px-5 py-4 text-base font-medium"
-    />
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <input
+            type="text"
+            placeholder="First username..."
+            value={username1}
+            onChange={e => setUsername1(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleCompare()}
+            className="brut-input flex-1 px-5 py-4 text-base font-medium"
+          />
 
-    <div className="brut-card-dark px-6 py-4 flex-shrink-0">
-      <span className="text-yellow-400 font-black text-xl mono">VS</span>
-    </div>
+          <div className="brut-card-dark px-6 py-4 flex-shrink-0">
+            <span className="text-yellow-400 font-black text-xl mono">VS</span>
+          </div>
 
-    <input
-      type="text"
-      placeholder="Second username..."
-      value={username2}
-      onChange={e => setUsername2(e.target.value)}
-      onKeyDown={e => e.key === 'Enter' && handleCompare()}
-      className="brut-input flex-1 px-5 py-4 text-base font-medium"
-    />
+          <input
+            type="text"
+            placeholder="Second username..."
+            value={username2}
+            onChange={e => setUsername2(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleCompare()}
+            className="brut-input flex-1 px-5 py-4 text-base font-medium"
+          />
 
-    <button
-      onClick={handleCompare}
-      className="brut-btn px-8 py-4 text-base flex-shrink-0"
-    >
-      Compare →
-    </button>
-  </div>
+          <button
+            onClick={handleCompare}
+            className="brut-btn px-8 py-4 text-base flex-shrink-0"
+          >
+            Compare →
+          </button>
+        </div>
 
-  {error && (
-    <div className="mt-4 border-2 border-red-500 p-3">
-      <p className="text-red-600 text-sm font-medium">{error}</p>
-    </div>
-  )}
-</div>
+        {error && (
+          <div className="mt-4 border-2 border-red-500 p-3">
+            <p className="text-red-600 text-sm font-medium">{error}</p>
+          </div>
+        )}
+      </div>
 
       {/* Loading */}
       {loading && (
@@ -220,9 +224,8 @@ function CompareUsers() {
               return (
                 <div
                   key={stat.label}
-                  className={`grid grid-cols-3 px-6 py-5 items-center border-b-2 border-black last:border-b-0 ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                  }`}
+                  className={`grid grid-cols-3 px-6 py-5 items-center border-b-2 border-black last:border-b-0 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                    }`}
                 >
                   {/* User 1 */}
                   <div className="flex items-center gap-2">
