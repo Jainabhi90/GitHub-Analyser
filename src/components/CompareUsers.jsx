@@ -43,6 +43,8 @@ function CompareUsers() {
         fetchRepos(username2.trim()),
         fetchEvents(username1.trim()),
         fetchEvents(username2.trim()),
+        fetch(`/api/contributions?username=${username1.trim()}`).then(r => r.json()),
+      fetch(`/api/contributions?username=${username2.trim()}`).then(r => r.json()),
       ])
 
       setUser1({
@@ -81,7 +83,7 @@ function CompareUsers() {
     { label: 'Top Language', v1: user1.topLanguage, v2: user2.topLanguage, isText: true },
     { label: 'Active Days (30d)', v1: user1.activeDays, v2: user2.activeDays },
     { label: 'PRs Opened', v1: user1.prs, v2: user2.prs },
-    { label: 'Commits (30d)', v1: user1.commits, v2: user2.commits },
+    { label: 'Commits (12 months)', v1: user1.commits, v2: user2.commits },
     { label: 'Issues Opened', v1: user1.issues, v2: user2.issues },
   ] : []
 
@@ -104,49 +106,51 @@ function CompareUsers() {
     <div className="max-w-5xl mx-auto space-y-6">
 
       {/* Input Section */}
-      <div className="brut-card p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="brut-tag-red">COMPARE</span>
-          <h2 className="text-2xl font-bold text-black">
-            Head to Head
-          </h2>
-        </div>
+<div className="brut-card p-8">
+  <div className="flex items-center gap-3 mb-6">
+    <span className="brut-tag-red">COMPARE</span>
+    <h2 className="text-2xl font-bold text-black">
+      Head to Head
+    </h2>
+  </div>
 
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <input
-            type="text"
-            placeholder="First username..."
-            value={username1}
-            onChange={e => setUsername1(e.target.value)}
-            className="brut-input flex-1 px-5 py-4 text-base font-medium"
-          />
+  <div className="flex flex-col md:flex-row gap-4 items-center">
+    <input
+      type="text"
+      placeholder="First username..."
+      value={username1}
+      onChange={e => setUsername1(e.target.value)}
+      onKeyDown={e => e.key === 'Enter' && handleCompare()}
+      className="brut-input flex-1 px-5 py-4 text-base font-medium"
+    />
 
-          <div className="brut-card-dark px-6 py-4 flex-shrink-0">
-            <span className="text-yellow-400 font-black text-xl mono">VS</span>
-          </div>
+    <div className="brut-card-dark px-6 py-4 flex-shrink-0">
+      <span className="text-yellow-400 font-black text-xl mono">VS</span>
+    </div>
 
-          <input
-            type="text"
-            placeholder="Second username..."
-            value={username2}
-            onChange={e => setUsername2(e.target.value)}
-            className="brut-input flex-1 px-5 py-4 text-base font-medium"
-          />
+    <input
+      type="text"
+      placeholder="Second username..."
+      value={username2}
+      onChange={e => setUsername2(e.target.value)}
+      onKeyDown={e => e.key === 'Enter' && handleCompare()}
+      className="brut-input flex-1 px-5 py-4 text-base font-medium"
+    />
 
-          <button
-            onClick={handleCompare}
-            className="brut-btn px-8 py-4 text-base flex-shrink-0"
-          >
-            Compare →
-          </button>
-        </div>
+    <button
+      onClick={handleCompare}
+      className="brut-btn px-8 py-4 text-base flex-shrink-0"
+    >
+      Compare →
+    </button>
+  </div>
 
-        {error && (
-          <div className="mt-4 border-2 border-red-500 p-3">
-            <p className="text-red-600 text-sm font-medium">{error}</p>
-          </div>
-        )}
-      </div>
+  {error && (
+    <div className="mt-4 border-2 border-red-500 p-3">
+      <p className="text-red-600 text-sm font-medium">{error}</p>
+    </div>
+  )}
+</div>
 
       {/* Loading */}
       {loading && (

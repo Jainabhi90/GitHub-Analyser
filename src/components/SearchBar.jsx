@@ -13,6 +13,7 @@ function SearchBar({ onSearch }) {
           type="text"
           name="username"
           placeholder="Enter GitHub username..."
+          autoFocus
           className="brut-input flex-1 px-5 py-3 text-sm font-medium"
         />
         <button type="submit" className="brut-btn px-8 py-3 text-sm">
