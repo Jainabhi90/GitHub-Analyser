@@ -5,27 +5,27 @@ function DeveloperScore({ user, repos, events }) {
   const totalStars = repos.reduce((sum, r) => sum + r.stargazers_count, 0)
 
   function scoreFollowers(f) {
-    if (f >= 10000) return 1
-    if (f >= 1000)  return 0.8
-    if (f >= 500)   return 0.6
-    if (f >= 100)   return 0.4
+    if (f >= 100) return 1
+    if (f >= 80)  return 0.8
+    if (f >= 60)   return 0.6
+    if (f >= 40)   return 0.4
     if (f >= 10)    return 0.2
     return 0.05
   }
   function scoreStars(s) {
-    if (s >= 10000) return 1
-    if (s >= 1000)  return 0.8
-    if (s >= 500)   return 0.6
-    if (s >= 100)   return 0.4
-    if (s >= 10)    return 0.2
+    if (s >= 100) return 1
+    if (s >= 100)  return 0.8
+    if (s >= 50)   return 0.6
+    if (s >= 10)   return 0.4
+    if (s >= 1)    return 0.2
     return 0.05
   }
   function scoreCommits(c) {
-    if (c >= 100) return 1
-    if (c >= 50)  return 0.8
-    if (c >= 20)  return 0.6
-    if (c >= 10)  return 0.4
-    if (c >= 3)   return 0.2
+    if (c >= 300) return 1
+    if (c >= 150)  return 0.8
+    if (c >= 100)  return 0.6
+    if (c >= 50)  return 0.4
+    if (c >= 30)   return 0.2
     return 0.05
   }
   function scorePRs(p) {
